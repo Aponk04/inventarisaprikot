@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Inventaris Barang</title>
+    <!-- Memuat Tailwind CSS untuk styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Memuat Font Inter dari Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Menggunakan font Inter sebagai font utama */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Style untuk transisi yang halus */
+        .transition-all {
+            transition: all 0.3s ease-in-out;
+        }
+        /* Menyembunyikan panah di input number */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+        /* Animasi fade-in untuk modal */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .modal-fade-in {
+            animation: fadeIn 0.2s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+        
+        <!-- Judul Aplikasi -->
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-700">📦 Aplikasi Inventaris Barang</h1>
+            <p class="text-gray-500 mt-2">Kelola stok barang Anda dengan mudah dan efisien.</p>
+        </header>
+
+        <!-- Bagian Form dan Tabel -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Kolom Form untuk Menambah Barang -->
+            <div class="lg:col-span-1 bg-white p-6 rounded-xl shadow-md">
+                <h2 class="text-xl font-semibold mb-4 border-b pb-3">Tambah Barang Baru</h2>
+                <form id="formBarang" class="space-y-4">
+                    <div>
+                        <label for="kodeBarang" class="block text-sm font-medium text-gray-600 mb-1">Kode Barang</label>
+                        <input type="text" id="kodeBarang" placeholder="Contoh: BRG-001" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" required>
+                    </div>
+                    <div>
+                        <label for="namaBarang" class="block text-sm font-medium text-gray-600 mb-1">Nama Barang</label>
+                        <input type="text" id="namaBarang" placeholder="Contoh: Laptop" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" required>
+                    </div>
+                    <div>
+                        <label for="jumlahBarang" class="block text-sm font-medium text-gray-600 mb-1">Jumlah</label>
+                        <input type="number" id="jumlahBarang" placeholder="Contoh: 10" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" required>
+                    </div>
+                    <div>
+                        <label for="satuanBarang" class="block text-sm font-medium text-gray-600 mb-1">Satuan</label>
+                        <input type="text" id="satuanBarang" placeholder="Contoh: Unit, Pcs, Box" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" required>
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 text-white font-bold py-2.5 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all">
+                        + Tambah ke Inventaris
+                    </button>
+                </form>
+            </div>
+
+            <!-- Kolom Tabel Inventaris -->
+            <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-md">
+                <div class="flex flex-col md:flex-row justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold">Daftar Barang</h2>
+                    <input type="text" id="cariBarang" placeholder="🔍 Cari barang..." class="w-full md:w-64 mt-4 md:mt-0 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                </div>
+                
+                <!-- Wrapper untuk tabel agar bisa scroll di layar kecil -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-50 border-b-2 border-gray-200">
+                            <tr>
+                                <th class="p-3 text-sm font-semibold tracking-wide">Kode Barang</th>
+                                <th class="p-3 text-sm font-semibold tracking-wide">Nama Barang</th>
+                                <th class="p-3 text-sm font-semibold tracking-wide">Jumlah</th>
+                                <th class="p-3 text-sm font-semibold tracking-wide">Satuan</th>
+                                <th class="p-3 text-sm font-semibold tracking-wide text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryTableBody" class="divide-y divide-gray-100">
+                            <!-- Data inventaris akan dimuat di sini oleh JavaScript -->
+                        </tbody>
+                    </table>
+                     <p id="noResults" class="text-center text-gray-500 py-8 hidden">Tidak ada barang yang ditemukan.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Konfirmasi Hapus -->
+    <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-11/12 max-w-sm modal-fade-in">
+            <h3 class="text-lg font-bold">Konfirmasi Hapus</h3>
+            <p class="text-gray-600 my-4">Apakah Anda yakin ingin menghapus barang ini?</p>
+            <div class="flex justify-end gap-4">
+                <button id="cancelDelete" class="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300 transition-all">Batal</button>
+                <button id="confirmDelete" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-all">Hapus</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // === ELEMEN DOM ===
+            const form = document.getElementById('formBarang');
+            const tableBody = document.getElementById('inventoryTableBody');
+            const searchInput = document.getElementById('cariBarang');
+            const noResults = document.getElementById('noResults');
+            const deleteModal = document.getElementById('deleteModal');
+            const cancelDeleteBtn = document.getElementById('cancelDelete');
+            const confirmDeleteBtn = document.getElementById('confirmDelete');
+
+            // === STATE APLIKASI ===
+            // Menggunakan localStorage untuk menyimpan data agar tidak hilang saat refresh
+            let inventory = JSON.parse(localStorage.getItem('inventoryData')) || [
+                { id: 'BRG-001', name: 'Laptop ASUS ROG', quantity: 5, unit: 'Unit' },
+                { id: 'BRG-002', name: 'Mouse Logitech MX Master 3', quantity: 15, unit: 'Pcs' },
+                { id: 'BRG-003', name: 'Kertas A4 Sinar Dunia', quantity: 20, unit: 'Rim' }
+            ];
+            
+            let itemToDeleteId = null;
+
+            // === FUNGSI-FUNGSI ===
+
+            /**
+             * Menyimpan data inventaris ke localStorage.
+             */
+            function saveInventory() {
+                localStorage.setItem('inventoryData', JSON.stringify(inventory));
+            }
+
+            /**
+             * Merender (menampilkan) data inventaris ke dalam tabel.
+             * @param {Array} data - Array data inventaris yang akan ditampilkan.
+             */
+            function renderTable(data) {
+                tableBody.innerHTML = ''; // Kosongkan tabel sebelum diisi ulang
+                
+                if (data.length === 0) {
+                    noResults.classList.remove('hidden');
+                } else {
+                    noResults.classList.add('hidden');
+                }
+
+                data.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-gray-50';
+                    row.innerHTML = `
+                        <td class="p-3 text-sm text-gray-700">${item.id}</td>
+                        <td class="p-3 text-sm text-gray-700 font-medium">${item.name}</td>
+                        <td class="p-3 text-sm text-gray-700">${item.quantity}</td>
+                        <td class="p-3 text-sm text-gray-700">
+                            <span class="px-2 py-1 text-xs font-medium tracking-wider text-green-800 bg-green-200 rounded-full">${item.unit}</span>
+                        </td>
+                        <td class="p-3 text-sm text-gray-700 text-center">
+                            <button data-id="${item.id}" class="delete-btn text-red-500 hover:text-red-700 font-semibold transition-all">Hapus</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+
+            /**
+             * Menampilkan modal konfirmasi hapus.
+             * @param {string} id - ID barang yang akan dihapus.
+             */
+            function showDeleteModal(id) {
+                itemToDeleteId = id;
+                deleteModal.classList.remove('hidden');
+            }
+
+            /**
+             * Menyembunyikan modal konfirmasi hapus.
+             */
+            function hideDeleteModal() {
+                itemToDeleteId = null;
+                deleteModal.classList.add('hidden');
+            }
+
+
+            // === EVENT LISTENERS ===
+
+            // Event listener untuk form penambahan barang
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                const id = document.getElementById('kodeBarang').value.trim();
+                const name = document.getElementById('namaBarang').value.trim();
+                const quantity = document.getElementById('jumlahBarang').value;
+                const unit = document.getElementById('satuanBarang').value.trim();
+                
+                // Validasi sederhana
+                if (!id || !name || !quantity || !unit) {
+                    alert('Semua kolom harus diisi!');
+                    return;
+                }
+                
+                // Cek apakah kode barang sudah ada
+                if (inventory.some(item => item.id.toLowerCase() === id.toLowerCase())) {
+                    alert('Kode barang sudah ada. Harap gunakan kode yang unik.');
+                    return;
+                }
+
+                const newItem = { id, name, quantity: parseInt(quantity), unit };
+                inventory.push(newItem);
+                
+                saveInventory();
+                renderTable(inventory);
+                form.reset();
+                document.getElementById('kodeBarang').focus();
+            });
+
+            // Event listener untuk pencarian barang
+            searchInput.addEventListener('keyup', function() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const filteredInventory = inventory.filter(item => 
+                    item.name.toLowerCase().includes(searchTerm) || 
+                    item.id.toLowerCase().includes(searchTerm)
+                );
+                renderTable(filteredInventory);
+            });
+
+            // Event listener untuk tombol hapus (menggunakan event delegation)
+            tableBody.addEventListener('click', function(event) {
+                if (event.target.classList.contains('delete-btn')) {
+                    const id = event.target.dataset.id;
+                    showDeleteModal(id);
+                }
+            });
+            
+            // Event listener untuk tombol konfirmasi hapus di modal
+            confirmDeleteBtn.addEventListener('click', function() {
+                if (itemToDeleteId) {
+                    inventory = inventory.filter(item => item.id !== itemToDeleteId);
+                    saveInventory();
+                    // Render ulang tabel berdasarkan input pencarian saat ini
+                    const searchTerm = searchInput.value.toLowerCase();
+                    const filteredInventory = inventory.filter(item => 
+                        item.name.toLowerCase().includes(searchTerm) || 
+                        item.id.toLowerCase().includes(searchTerm)
+                    );
+                    renderTable(filteredInventory);
+                    hideDeleteModal();
+                }
+            });
+
+            // Event listener untuk tombol batal di modal
+            cancelDeleteBtn.addEventListener('click', hideDeleteModal);
+            
+            // Menutup modal jika klik di luar area modal
+            deleteModal.addEventListener('click', function(event) {
+                if (event.target === deleteModal) {
+                    hideDeleteModal();
+                }
+            });
+
+
+            // === INISIALISASI ===
+            // Tampilkan data awal saat halaman dimuat
+            renderTable(inventory);
+        });
+    </script>
+
+</body>
+</html>
