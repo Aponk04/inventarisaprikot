@@ -11,31 +11,18 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Menggunakan font Inter sebagai font utama */
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        /* Style untuk transisi yang halus */
-        .transition-all {
-            transition: all 0.3s ease-in-out;
-        }
-        /* Menyembunyikan panah di input number */
+        body { font-family: 'Inter', sans-serif; }
+        .transition-all { transition: all 0.3s ease-in-out; }
         input[type=number]::-webkit-inner-spin-button,
         input[type=number]::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
+            -webkit-appearance: none; margin: 0;
         }
-        input[type=number] {
-            -moz-appearance: textfield;
-        }
-        /* Animasi fade-in untuk modal */
+        input[type=number] { -moz-appearance: textfield; }
         @keyframes fadeIn {
             from { opacity: 0; transform: scale(0.95); }
             to { opacity: 1; transform: scale(1); }
         }
-        .modal-fade-in {
-            animation: fadeIn 0.2s ease-out forwards;
-        }
+        .modal-fade-in { animation: fadeIn 0.2s ease-out forwards; }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -43,8 +30,8 @@
     <div class="container mx-auto p-4 md:p-8 max-w-7xl">
         
         <header class="mb-8 text-center">
-            <h1 class="text-3xl md:text-4xl font-bold text-gray-700">📦 Aplikasi Inventaris ruangan Aprikot</h1>
-            <p class="text-gray-500 mt-2">Kelola Data Barang Ruangan Aprikot.</p>
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-700">📦 Aplikasi Inventaris Barang</h1>
+            <p class="text-gray-500 mt-2">Kelola stok barang Anda dengan mudah, lengkap dengan foto.</p>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -54,25 +41,31 @@
                 <form id="formBarang" class="space-y-4">
                     <div>
                         <label for="kodeBarang" class="block text-sm font-medium text-gray-600 mb-1">Kode Barang</label>
-                        <input type="text" id="kodeBarang" placeholder="Contoh: BRG-001" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" required>
+                        <input type="text" id="kodeBarang" placeholder="Contoh: BRG-001" class="w-full p-2 border border-gray-300 rounded-md" required>
                     </div>
                     <div>
                         <label for="namaBarang" class="block text-sm font-medium text-gray-600 mb-1">Nama Barang</label>
-                        <input type="text" id="namaBarang" placeholder="Contoh: Laptop" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" required>
+                        <input type="text" id="namaBarang" placeholder="Contoh: Laptop" class="w-full p-2 border border-gray-300 rounded-md" required>
                     </div>
                     <div>
                         <label for="jumlahBarang" class="block text-sm font-medium text-gray-600 mb-1">Jumlah</label>
-                        <input type="number" id="jumlahBarang" placeholder="Contoh: 10" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" required>
+                        <input type="number" id="jumlahBarang" placeholder="Contoh: 10" class="w-full p-2 border border-gray-300 rounded-md" required>
                     </div>
                     <div>
                         <label for="satuanBarang" class="block text-sm font-medium text-gray-600 mb-1">Satuan</label>
-                        <input type="text" id="satuanBarang" placeholder="Contoh: Unit, Pcs, Box" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" required>
+                        <input type="text" id="satuanBarang" placeholder="Contoh: Unit, Pcs, Box" class="w-full p-2 border border-gray-300 rounded-md" required>
                     </div>
                     <div>
                         <label for="keteranganBarang" class="block text-sm font-medium text-gray-600 mb-1">Keterangan</label>
-                        <input type="text" id="keteranganBarang" placeholder="Contoh: RAM 16GB, Warna Hitam" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                        <input type="text" id="keteranganBarang" placeholder="Contoh: RAM 16GB, Warna Hitam" class="w-full p-2 border border-gray-300 rounded-md">
                     </div>
-                    <button id="submitButton" type="submit" class="w-full bg-blue-600 text-white font-bold py-2.5 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all">
+                    <!-- [BARU] Input untuk Foto Barang -->
+                    <div>
+                        <label for="fotoBarang" class="block text-sm font-medium text-gray-600 mb-1">Foto Barang</label>
+                        <input type="file" id="fotoBarang" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                        <img id="imagePreview" src="" alt="Pratinjau Gambar" class="mt-2 rounded-md max-h-32 hidden"/>
+                    </div>
+                    <button id="submitButton" type="submit" class="w-full bg-blue-600 text-white font-bold py-2.5 px-4 rounded-md hover:bg-blue-700">
                         + Tambah ke Inventaris
                     </button>
                 </form>
@@ -81,23 +74,24 @@
             <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-md">
                 <div class="flex flex-col md:flex-row justify-between items-center mb-4">
                     <h2 class="text-xl font-semibold">Daftar Barang</h2>
-                    <input type="text" id="cariBarang" placeholder="🔍 Cari barang..." class="w-full md:w-64 mt-4 md:mt-0 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                    <input type="text" id="cariBarang" placeholder="🔍 Cari barang..." class="w-full md:w-64 mt-4 md:mt-0 p-2 border border-gray-300 rounded-md">
                 </div>
                 
                 <div class="overflow-x-auto">
                     <table class="w-full text-left">
                         <thead class="bg-gray-50 border-b-2 border-gray-200">
                             <tr>
+                                <!-- [BARU] Kolom header Foto -->
+                                <th class="p-3 text-sm font-semibold tracking-wide">Foto</th>
                                 <th class="p-3 text-sm font-semibold tracking-wide">Kode Barang</th>
                                 <th class="p-3 text-sm font-semibold tracking-wide">Nama Barang</th>
                                 <th class="p-3 text-sm font-semibold tracking-wide">Jumlah</th>
-                                <th class="p-3 text-sm font-semibold tracking-wide">Satuan</th>
                                 <th class="p-3 text-sm font-semibold tracking-wide">Keterangan</th>
                                 <th class="p-3 text-sm font-semibold tracking-wide text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="inventoryTableBody" class="divide-y divide-gray-100">
-                            <!-- Data inventaris akan dimuat di sini oleh JavaScript -->
+                            <!-- Data inventaris akan dimuat di sini -->
                         </tbody>
                     </table>
                      <p id="noResults" class="text-center text-gray-500 py-8 hidden">Tidak ada barang yang ditemukan.</p>
@@ -106,221 +100,169 @@
         </div>
     </div>
 
-    <!-- [BARU] Modal Autentikasi -->
+    <!-- Modal Autentikasi -->
     <div id="authModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden z-50">
         <div class="bg-white p-6 rounded-lg shadow-xl w-11/12 max-w-sm modal-fade-in">
             <h3 id="authTitle" class="text-lg font-bold">Autentikasi Diperlukan</h3>
-            <p class="text-gray-600 my-2">Masukkan username dan password untuk melanjutkan.</p>
             <form id="authForm" class="space-y-4 mt-4">
-                 <div>
-                    <label for="username" class="block text-sm font-medium text-gray-600 mb-1">Username</label>
-                    <input type="text" id="username" class="w-full p-2 border border-gray-300 rounded-md">
-                </div>
-                <div>
-                    <label for="password" class="block text-sm font-medium text-gray-600 mb-1">Password</label>
-                    <input type="password" id="password" class="w-full p-2 border border-gray-300 rounded-md">
-                </div>
-                <p id="authError" class="text-red-500 text-sm hidden">Username atau password salah!</p>
+                 <input type="text" id="username" placeholder="Username" class="w-full p-2 border border-gray-300 rounded-md">
+                 <input type="password" id="password" placeholder="Password" class="w-full p-2 border border-gray-300 rounded-md">
+                 <p id="authError" class="text-red-500 text-sm hidden">Username atau password salah!</p>
                 <div class="flex justify-end gap-4 pt-2">
-                    <button type="button" id="cancelAuth" class="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300 transition-all">Batal</button>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-all">Lanjut</button>
+                    <button type="button" id="cancelAuth" class="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300">Batal</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Lanjut</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- [DIUBAH] Modal Konfirmasi Aksi (Edit/Hapus) -->
+    <!-- Modal Konfirmasi Aksi -->
     <div id="confirmActionModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden z-50">
         <div class="bg-white p-6 rounded-lg shadow-xl w-11/12 max-w-sm modal-fade-in">
             <h3 class="text-lg font-bold">Konfirmasi</h3>
             <p id="confirmMessage" class="text-gray-600 my-4">Apakah Anda yakin?</p>
             <div class="flex justify-end gap-4">
-                <button id="cancelAction" class="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300 transition-all">Tidak</button>
-                <button id="confirmAction" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-all">Ya</button>
+                <button id="cancelAction" class="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300">Tidak</button>
+                <button id="confirmAction" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">Ya</button>
             </div>
         </div>
     </div>
-
+    
+    <!-- [BARU] Modal untuk menampilkan gambar penuh -->
+    <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center hidden z-50 p-4">
+        <img id="fullImage" src="" alt="Tampilan Penuh" class="max-w-full max-h-full rounded-lg">
+        <button id="closeImageModal" class="absolute top-4 right-4 text-white text-3xl font-bold">&times;</button>
+    </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            
-            // === ELEMEN DOM ===
-            const form = document.getElementById('formBarang');
-            const formTitle = document.getElementById('formTitle');
-            const submitButton = document.getElementById('submitButton');
-            const tableBody = document.getElementById('inventoryTableBody');
-            const searchInput = document.getElementById('cariBarang');
-            const noResults = document.getElementById('noResults');
-            
-            // Modal Autentikasi
-            const authModal = document.getElementById('authModal');
-            const authForm = document.getElementById('authForm');
-            const authTitle = document.getElementById('authTitle');
-            const authError = document.getElementById('authError');
-            const cancelAuthBtn = document.getElementById('cancelAuth');
-            const usernameInput = document.getElementById('username');
-            const passwordInput = document.getElementById('password');
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        // === ELEMEN DOM ===
+        const form = document.getElementById('formBarang');
+        const formTitle = document.getElementById('formTitle');
+        const submitButton = document.getElementById('submitButton');
+        const tableBody = document.getElementById('inventoryTableBody');
+        const searchInput = document.getElementById('cariBarang');
+        const noResults = document.getElementById('noResults');
+        const imagePreview = document.getElementById('imagePreview');
+        const fotoBarangInput = document.getElementById('fotoBarang');
+        
+        const authModal = document.getElementById('authModal');
+        const authForm = document.getElementById('authForm');
+        const authTitle = document.getElementById('authTitle');
+        const authError = document.getElementById('authError');
+        const cancelAuthBtn = document.getElementById('cancelAuth');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
 
-            // Modal Konfirmasi
-            const confirmActionModal = document.getElementById('confirmActionModal');
-            const confirmMessage = document.getElementById('confirmMessage');
-            const cancelActionBtn = document.getElementById('cancelAction');
-            const confirmActionBtn = document.getElementById('confirmAction');
+        const confirmActionModal = document.getElementById('confirmActionModal');
+        const confirmMessage = document.getElementById('confirmMessage');
+        const cancelActionBtn = document.getElementById('cancelAction');
+        const confirmActionBtn = document.getElementById('confirmAction');
 
-            // === STATE APLIKASI ===
-            let inventory = JSON.parse(localStorage.getItem('inventoryData')) || [
-                { id: 'BRG-001', name: 'Stetoskop', quantity: 5, unit: 'Unit', description: 'Bisa di gunakan' },
-                { id: 'BRG-002', name: 'Tensi', quantity: 15, unit: 'Pcs', description: 'Berfungsi dengan normal' },
-                { id: 'BRG-003', name: 'Kertas A4 Sinar Dunia', quantity: 20, unit: 'Rim', description: '70 gsm' }
-            ];
-            
-            let currentAction = null; // 'edit' atau 'delete'
-            let actionItemId = null;  // ID barang yang akan diaksi
-            let editItemId = null;    // ID barang yang sedang diedit di form
+        const imageModal = document.getElementById('imageModal');
+        const fullImage = document.getElementById('fullImage');
+        const closeImageModalBtn = document.getElementById('closeImageModal');
 
-            // === FUNGSI-FUNGSI ===
+        // === STATE APLIKASI ===
+        let inventory = JSON.parse(localStorage.getItem('inventoryData')) || [];
+        
+        let currentAction = null;
+        let actionItemId = null;
+        let editItemId = null;
 
-            function saveInventory() {
-                localStorage.setItem('inventoryData', JSON.stringify(inventory));
-            }
+        // === FUNGSI-FUNGSI ===
 
-            function renderTable(data) {
-                tableBody.innerHTML = '';
-                noResults.classList.toggle('hidden', data.length > 0);
+        function saveInventory() {
+            localStorage.setItem('inventoryData', JSON.stringify(inventory));
+        }
 
-                data.forEach(item => {
-                    const row = document.createElement('tr');
-                    row.className = 'hover:bg-gray-50';
-                    row.innerHTML = `
-                        <td class="p-3 text-sm text-gray-700">${item.id}</td>
-                        <td class="p-3 text-sm text-gray-700 font-medium">${item.name}</td>
-                        <td class="p-3 text-sm text-gray-700">${item.quantity}</td>
-                        <td class="p-3 text-sm text-gray-700">
-                            <span class="px-2 py-1 text-xs font-medium tracking-wider text-green-800 bg-green-200 rounded-full">${item.unit}</span>
-                        </td>
-                        <td class="p-3 text-sm text-gray-500">${item.description || '-'}</td>
-                        <td class="p-3 text-sm text-gray-700 text-center space-x-2">
-                            <button data-id="${item.id}" class="edit-btn text-blue-500 hover:text-blue-700 font-semibold transition-all">Edit</button>
-                            <button data-id="${item.id}" class="delete-btn text-red-500 hover:text-red-700 font-semibold transition-all">Hapus</button>
-                        </td>
-                    `;
-                    tableBody.appendChild(row);
-                });
-            }
-            
-            // Fungsi untuk menampilkan modal
-            function showModal(modal) {
-                modal.classList.remove('hidden');
-            }
+        function renderTable(data) {
+            tableBody.innerHTML = '';
+            noResults.classList.toggle('hidden', data.length > 0);
 
-            // Fungsi untuk menyembunyikan modal
-            function hideModal(modal) {
-                modal.classList.add('hidden');
-            }
-            
-            // Mengatur form ke mode "Tambah Barang"
-            function setCreateMode() {
-                editItemId = null;
-                form.reset();
-                document.getElementById('kodeBarang').disabled = false;
-                formTitle.textContent = 'Tambah Barang Baru';
-                submitButton.textContent = '+ Tambah ke Inventaris';
-                submitButton.className = 'w-full bg-blue-600 text-white font-bold py-2.5 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all';
-            }
-
-            // Mengatur form ke mode "Edit Barang"
-            function setEditMode(item) {
-                editItemId = item.id;
-                document.getElementById('kodeBarang').value = item.id;
-                document.getElementById('kodeBarang').disabled = true; // Kode barang tidak bisa diedit
-                document.getElementById('namaBarang').value = item.name;
-                document.getElementById('jumlahBarang').value = item.quantity;
-                document.getElementById('satuanBarang').value = item.unit;
-                document.getElementById('keteranganBarang').value = item.description;
-                
-                formTitle.textContent = `Mengedit: ${item.name}`;
-                submitButton.textContent = 'Simpan Perubahan';
-                submitButton.className = 'w-full bg-green-600 text-white font-bold py-2.5 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all';
-            }
-
-            // === EVENT LISTENERS ===
-
-            // Listener utama pada tabel untuk tombol Edit dan Hapus
-            tableBody.addEventListener('click', function(event) {
-                const target = event.target;
-                const id = target.dataset.id;
-                if (!id) return;
-
-                if (target.classList.contains('edit-btn')) {
-                    currentAction = 'edit';
-                    actionItemId = id;
-                    authTitle.textContent = 'Autentikasi untuk Mengedit';
-                    showModal(authModal);
-                } else if (target.classList.contains('delete-btn')) {
-                    currentAction = 'delete';
-                    actionItemId = id;
-                    authTitle.textContent = 'Autentikasi untuk Menghapus';
-                    showModal(authModal);
-                }
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50';
+                const placeholderImg = `https://placehold.co/100x100/e2e8f0/94a3b8?text=No+Image`;
+                row.innerHTML = `
+                    <td class="p-3">
+                        <img src="${item.photo || placeholderImg}" alt="${item.name}" class="thumbnail-img h-12 w-12 rounded-md object-cover cursor-pointer hover:scale-110 transition-transform">
+                    </td>
+                    <td class="p-3 text-sm text-gray-700">${item.id}</td>
+                    <td class="p-3 text-sm text-gray-700 font-medium">${item.name}</td>
+                    <td class="p-3 text-sm text-gray-700">${item.quantity} ${item.unit}</td>
+                    <td class="p-3 text-sm text-gray-500">${item.description || '-'}</td>
+                    <td class="p-3 text-sm text-gray-700 text-center space-x-2">
+                        <button data-id="${item.id}" class="edit-btn text-blue-500 hover:text-blue-700 font-semibold">Edit</button>
+                        <button data-id="${item.id}" class="delete-btn text-red-500 hover:text-red-700 font-semibold">Hapus</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
             });
+        }
+        
+        function showModal(modal) { modal.classList.remove('hidden'); }
+        function hideModal(modal) { modal.classList.add('hidden'); }
+        
+        function setCreateMode() {
+            editItemId = null;
+            form.reset();
+            imagePreview.classList.add('hidden');
+            document.getElementById('kodeBarang').disabled = false;
+            formTitle.textContent = 'Tambah Barang Baru';
+            submitButton.textContent = '+ Tambah ke Inventaris';
+            submitButton.className = 'w-full bg-blue-600 text-white font-bold py-2.5 px-4 rounded-md hover:bg-blue-700';
+        }
 
-            // Listener untuk form autentikasi
-            authForm.addEventListener('submit', function(event) {
-                event.preventDefault();
-                const user = usernameInput.value;
-                const pass = passwordInput.value;
-
-                if (user === 'Aponk' && pass === '2025') {
-                    hideModal(authModal);
-                    authForm.reset();
-                    authError.classList.add('hidden');
-
-                    if (currentAction === 'edit') {
-                        confirmMessage.textContent = 'Apakah Anda yakin ingin mengedit barang ini??';
-                    } else if (currentAction === 'delete') {
-                        confirmMessage.textContent = 'Apakah Anda yakin ingin menghapus barang ini??';
-                    }
-                    showModal(confirmActionModal);
-                } else {
-                    authError.classList.remove('hidden');
-                }
-            });
+        function setEditMode(item) {
+            editItemId = item.id;
+            document.getElementById('kodeBarang').value = item.id;
+            document.getElementById('kodeBarang').disabled = true;
+            document.getElementById('namaBarang').value = item.name;
+            document.getElementById('jumlahBarang').value = item.quantity;
+            document.getElementById('satuanBarang').value = item.unit;
+            document.getElementById('keteranganBarang').value = item.description;
             
-            // Listener untuk tombol konfirmasi aksi (Ya)
-            confirmActionBtn.addEventListener('click', function() {
-                hideModal(confirmActionModal);
-                if (currentAction === 'delete') {
-                    inventory = inventory.filter(item => item.id !== actionItemId);
-                    saveInventory();
-                    renderTable(inventory);
-                } else if (currentAction === 'edit') {
-                    const itemToEdit = inventory.find(item => item.id === actionItemId);
-                    if (itemToEdit) {
-                        setEditMode(itemToEdit);
-                    }
-                }
-            });
+            if (item.photo) {
+                imagePreview.src = item.photo;
+                imagePreview.classList.remove('hidden');
+            } else {
+                imagePreview.classList.add('hidden');
+            }
+            
+            formTitle.textContent = `Mengedit: ${item.name}`;
+            submitButton.textContent = 'Simpan Perubahan';
+            submitButton.className = 'w-full bg-green-600 text-white font-bold py-2.5 px-4 rounded-md hover:bg-green-700';
+            window.scrollTo(0, 0);
+        }
+        
+        // Fungsi untuk menangani submit form (tambah/edit)
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            
+            const file = fotoBarangInput.files[0];
+            const values = {
+                id: document.getElementById('kodeBarang').value.trim(),
+                name: document.getElementById('namaBarang').value.trim(),
+                quantity: parseInt(document.getElementById('jumlahBarang').value),
+                unit: document.getElementById('satuanBarang').value.trim(),
+                description: document.getElementById('keteranganBarang').value.trim()
+            };
 
-            // Listener untuk form utama (Tambah atau Simpan Perubahan)
-            form.addEventListener('submit', function(event) {
-                event.preventDefault();
-                
-                const values = {
-                    id: document.getElementById('kodeBarang').value.trim(),
-                    name: document.getElementById('namaBarang').value.trim(),
-                    quantity: parseInt(document.getElementById('jumlahBarang').value),
-                    unit: document.getElementById('satuanBarang').value.trim(),
-                    description: document.getElementById('keteranganBarang').value.trim()
-                };
-
-                if (editItemId) { // Mode Edit
+            const processData = (photoData) => {
+                values.photo = photoData;
+                if (editItemId) {
                     const itemIndex = inventory.findIndex(item => item.id === editItemId);
                     if (itemIndex > -1) {
-                        inventory[itemIndex] = { ...inventory[itemIndex], ...values };
+                        // Jika tidak ada foto baru, pertahankan foto lama
+                        if (!values.photo) {
+                            values.photo = inventory[itemIndex].photo;
+                        }
+                        inventory[itemIndex] = values;
                     }
                     setCreateMode();
-                } else { // Mode Tambah
+                } else {
                     if (inventory.some(item => item.id.toLowerCase() === values.id.toLowerCase())) {
                         alert('Kode barang sudah ada. Harap gunakan kode yang unik.');
                         return;
@@ -328,33 +270,90 @@
                     inventory.push(values);
                     form.reset();
                 }
-                
                 saveInventory();
                 renderTable(inventory);
-                document.getElementById('kodeBarang').focus();
-            });
-            
-            // Listeners untuk membatalkan/menutup modal
-            cancelAuthBtn.addEventListener('click', () => hideModal(authModal));
-            cancelActionBtn.addEventListener('click', () => hideModal(confirmActionModal));
-            authModal.addEventListener('click', (e) => e.target === authModal && hideModal(authModal));
-            confirmActionModal.addEventListener('click', (e) => e.target === confirmActionModal && hideModal(confirmActionModal));
+            };
 
-            // Listener untuk pencarian
-            searchInput.addEventListener('keyup', function() {
-                const searchTerm = searchInput.value.toLowerCase();
-                const filtered = inventory.filter(item => 
-                    item.name.toLowerCase().includes(searchTerm) || 
-                    item.id.toLowerCase().includes(searchTerm) ||
-                    (item.description && item.description.toLowerCase().includes(searchTerm))
-                );
-                renderTable(filtered);
-            });
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    processData(e.target.result); // e.target.result berisi data URL Base64
+                };
+                reader.readAsDataURL(file);
+            } else {
+                processData(null); // Tidak ada file yang dipilih
+            }
+        }
 
-            // === INISIALISASI ===
-            renderTable(inventory);
+        // === EVENT LISTENERS ===
+        form.addEventListener('submit', handleFormSubmit);
+
+        tableBody.addEventListener('click', function(event) {
+            const target = event.target;
+            const id = target.closest('tr')?.querySelector('.edit-btn, .delete-btn')?.dataset.id;
+
+            if (target.classList.contains('thumbnail-img')) {
+                fullImage.src = target.src;
+                showModal(imageModal);
+            } else if (target.classList.contains('edit-btn')) {
+                currentAction = 'edit';
+                actionItemId = id;
+                authTitle.textContent = 'Autentikasi untuk Mengedit';
+                showModal(authModal);
+            } else if (target.classList.contains('delete-btn')) {
+                currentAction = 'delete';
+                actionItemId = id;
+                authTitle.textContent = 'Autentikasi untuk Menghapus';
+                showModal(authModal);
+            }
         });
-    </script>
 
+        authForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            if (usernameInput.value === 'Aponk' && passwordInput.value === '2025') {
+                hideModal(authModal);
+                authForm.reset();
+                authError.classList.add('hidden');
+                confirmMessage.textContent = `Apakah Anda yakin ingin ${currentAction === 'edit' ? 'mengedit' : 'menghapus'} barang ini??`;
+                showModal(confirmActionModal);
+            } else {
+                authError.classList.remove('hidden');
+            }
+        });
+        
+        confirmActionBtn.addEventListener('click', function() {
+            hideModal(confirmActionModal);
+            if (currentAction === 'delete') {
+                inventory = inventory.filter(item => item.id !== actionItemId);
+                saveInventory();
+                renderTable(inventory);
+            } else if (currentAction === 'edit') {
+                const itemToEdit = inventory.find(item => item.id === actionItemId);
+                if (itemToEdit) setEditMode(itemToEdit);
+            }
+        });
+        
+        searchInput.addEventListener('keyup', function() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const filtered = inventory.filter(item => 
+                item.name.toLowerCase().includes(searchTerm) || 
+                item.id.toLowerCase().includes(searchTerm) ||
+                (item.description && item.description.toLowerCase().includes(searchTerm))
+            );
+            renderTable(filtered);
+        });
+        
+        // Listeners untuk menutup modal
+        cancelAuthBtn.addEventListener('click', () => hideModal(authModal));
+        cancelActionBtn.addEventListener('click', () => hideModal(confirmActionModal));
+        closeImageModalBtn.addEventListener('click', () => hideModal(imageModal));
+        authModal.addEventListener('click', (e) => e.target === authModal && hideModal(authModal));
+        confirmActionModal.addEventListener('click', (e) => e.target === confirmActionModal && hideModal(confirmActionModal));
+        imageModal.addEventListener('click', (e) => e.target === imageModal && hideModal(imageModal));
+
+        // === INISIALISASI ===
+        renderTable(inventory);
+    });
+    </script>
 </body>
 </html>
