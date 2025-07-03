@@ -84,9 +84,18 @@
             </div>
 
             <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-md">
-                <div class="flex flex-col md:flex-row justify-between items-center mb-4">
+                <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
                     <h2 class="text-xl font-semibold">Daftar Barang</h2>
-                    <input type="text" id="cariBarang" placeholder="🔍 Cari barang..." class="w-full md:w-64 mt-4 md:mt-0 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                    <div class="flex items-center gap-4 w-full md:w-auto">
+                        <input type="text" id="cariBarang" placeholder="🔍 Cari barang..." class="w-full md:w-64 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                        <!-- Tombol Export PDF -->
+                        <button id="exportPdfButton" class="bg-red-600 text-white px-3 py-2 rounded-lg hover:bg-red-700 transition-colors flex items-center text-sm shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            Export PDF
+                        </button>
+                    </div>
                 </div>
                 
                 <div class="overflow-x-auto">
@@ -147,7 +156,7 @@
         </div>
     </div>
 
-    <!-- [BARU] Modal Lihat Gambar -->
+    <!-- Modal Lihat Gambar -->
     <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center hidden z-50 p-4">
         <div class="relative">
             <img id="modalImage" src="" alt="Tampilan Penuh Gambar Barang" class="max-w-[90vw] max-h-[80vh] rounded-lg shadow-lg">
@@ -159,7 +168,10 @@
         </div>
     </div>
 
-
+    <!-- Memuat Pustaka jsPDF dan autoTable untuk fungsionalitas PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://unpkg.com/jspdf-autotable@latest/dist/jspdf.plugin.autotable.js"></script>
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             
@@ -186,10 +198,13 @@
             const cancelActionBtn = document.getElementById('cancelAction');
             const confirmActionBtn = document.getElementById('confirmAction');
 
-            // [BARU] Modal Gambar
+            // Modal Gambar
             const imageModal = document.getElementById('imageModal');
             const modalImage = document.getElementById('modalImage');
             const closeImageModalBtn = document.getElementById('closeImageModal');
+
+            // Tombol Export
+            const exportPdfButton = document.getElementById('exportPdfButton');
 
             // === STATE APLIKASI ===
             let inventory = JSON.parse(localStorage.getItem('inventoryData')) || [
@@ -267,6 +282,64 @@
                 formTitle.textContent = `Mengedit: ${item.name}`;
                 submitButton.textContent = 'Simpan Perubahan';
                 submitButton.className = 'w-full bg-green-600 text-white font-bold py-2.5 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all';
+            }
+
+            function exportToPDF() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'pt',
+                    format: 'legal'
+                });
+
+                doc.setFontSize(18);
+                doc.text('Daftar Inventaris Barang - Ruangan Aprikot', 40, 40);
+
+                doc.autoTable({
+                    head: [['Gambar', 'Kode', 'Nama Barang', 'Jumlah', 'Satuan', 'Keterangan']],
+                    body: inventory.map(item => [
+                        '', // Empty cell for image
+                        item.id,
+                        item.name,
+                        item.quantity,
+                        item.unit,
+                        item.description || '-'
+                    ]),
+                    startY: 60,
+                    theme: 'grid',
+                    styles: {
+                        fontSize: 12,
+                        cellPadding: 8,
+                        valign: 'middle'
+                    },
+                    headStyles: {
+                        fillColor: [220, 53, 69],
+                        fontSize: 12,
+                        fontStyle: 'bold',
+                        textColor: [255, 255, 255]
+                    },
+                    columnStyles: {
+                        0: { minCellWidth: 50, minCellHeight: 50 }
+                    },
+                    didDrawCell: function(data) {
+                        if (data.column.index === 0 && data.cell.section === 'body') {
+                            const item = inventory[data.row.index];
+                            if (item.imageUrl) {
+                                try {
+                                    const imgWidth = 40;
+                                    const imgHeight = 40;
+                                    const x = data.cell.x + (data.cell.width - imgWidth) / 2;
+                                    const y = data.cell.y + (data.cell.height - imgHeight) / 2;
+                                    doc.addImage(item.imageUrl, 'JPEG', x, y, imgWidth, imgHeight);
+                                } catch (e) {
+                                    console.error(`Error adding image for item ${item.id}:`, e);
+                                }
+                            }
+                        }
+                    }
+                });
+
+                doc.save('inventaris-ruangan-aprikot.pdf');
             }
 
             // === EVENT LISTENERS ===
@@ -383,7 +456,6 @@
             authModal.addEventListener('click', (e) => e.target === authModal && hideModal(authModal));
             confirmActionModal.addEventListener('click', (e) => e.target === confirmActionModal && hideModal(confirmActionModal));
             
-            // [BARU] Listener untuk menutup modal gambar
             closeImageModalBtn.addEventListener('click', () => hideModal(imageModal));
             imageModal.addEventListener('click', (e) => e.target === imageModal && hideModal(imageModal));
 
@@ -396,6 +468,8 @@
                 );
                 renderTable(filtered);
             });
+
+            exportPdfButton.addEventListener('click', exportToPDF);
 
             // === INISIALISASI ===
             renderTable(inventory);
