@@ -72,6 +72,11 @@
                         <label for="keteranganBarang" class="block text-sm font-medium text-gray-600 mb-1">Keterangan</label>
                         <input type="text" id="keteranganBarang" placeholder="Contoh: RAM 16GB, Warna Hitam" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
                     </div>
+                    <!-- Input untuk gambar barang -->
+                    <div>
+                        <label for="gambarBarang" class="block text-sm font-medium text-gray-600 mb-1">Gambar Barang</label>
+                        <input type="file" id="gambarBarang" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                    </div>
                     <button id="submitButton" type="submit" class="w-full bg-blue-600 text-white font-bold py-2.5 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all">
                         + Tambah ke Inventaris
                     </button>
@@ -88,6 +93,7 @@
                     <table class="w-full text-left">
                         <thead class="bg-gray-50 border-b-2 border-gray-200">
                             <tr>
+                                <th class="p-3 text-sm font-semibold tracking-wide">Gambar</th>
                                 <th class="p-3 text-sm font-semibold tracking-wide">Kode Barang</th>
                                 <th class="p-3 text-sm font-semibold tracking-wide">Nama Barang</th>
                                 <th class="p-3 text-sm font-semibold tracking-wide">Jumlah</th>
@@ -106,7 +112,7 @@
         </div>
     </div>
 
-    <!-- [BARU] Modal Autentikasi -->
+    <!-- Modal Autentikasi -->
     <div id="authModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden z-50">
         <div class="bg-white p-6 rounded-lg shadow-xl w-11/12 max-w-sm modal-fade-in">
             <h3 id="authTitle" class="text-lg font-bold">Autentikasi Diperlukan</h3>
@@ -129,7 +135,7 @@
         </div>
     </div>
 
-    <!-- [DIUBAH] Modal Konfirmasi Aksi (Edit/Hapus) -->
+    <!-- Modal Konfirmasi Aksi (Edit/Hapus) -->
     <div id="confirmActionModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden z-50">
         <div class="bg-white p-6 rounded-lg shadow-xl w-11/12 max-w-sm modal-fade-in">
             <h3 class="text-lg font-bold">Konfirmasi</h3>
@@ -138,6 +144,18 @@
                 <button id="cancelAction" class="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300 transition-all">Tidak</button>
                 <button id="confirmAction" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-all">Ya</button>
             </div>
+        </div>
+    </div>
+
+    <!-- [BARU] Modal Lihat Gambar -->
+    <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center hidden z-50 p-4">
+        <div class="relative">
+            <img id="modalImage" src="" alt="Tampilan Penuh Gambar Barang" class="max-w-[90vw] max-h-[80vh] rounded-lg shadow-lg">
+            <button id="closeImageModal" class="absolute -top-3 -right-3 bg-white rounded-full p-1.5 text-gray-800 hover:bg-gray-200 transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
         </div>
     </div>
 
@@ -168,11 +186,16 @@
             const cancelActionBtn = document.getElementById('cancelAction');
             const confirmActionBtn = document.getElementById('confirmAction');
 
+            // [BARU] Modal Gambar
+            const imageModal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            const closeImageModalBtn = document.getElementById('closeImageModal');
+
             // === STATE APLIKASI ===
             let inventory = JSON.parse(localStorage.getItem('inventoryData')) || [
-                { id: 'BRG-001', name: 'Stetoskop', quantity: 5, unit: 'Unit', description: 'Bisa di gunakan' },
-                { id: 'BRG-002', name: 'Tensi', quantity: 15, unit: 'Pcs', description: 'Berfungsi dengan normal' },
-                { id: 'BRG-003', name: 'Kertas A4 Sinar Dunia', quantity: 20, unit: 'Rim', description: '70 gsm' }
+                { id: 'BRG-001', name: 'Stetoskop', quantity: 5, unit: 'Unit', description: 'Bisa di gunakan', imageUrl: null },
+                { id: 'BRG-002', name: 'Tensi', quantity: 15, unit: 'Pcs', description: 'Berfungsi dengan normal', imageUrl: null },
+                { id: 'BRG-003', name: 'Kertas A4 Sinar Dunia', quantity: 20, unit: 'Rim', description: '70 gsm', imageUrl: null }
             ];
             
             let currentAction = null; // 'edit' atau 'delete'
@@ -192,7 +215,13 @@
                 data.forEach(item => {
                     const row = document.createElement('tr');
                     row.className = 'hover:bg-gray-50';
+                    const placeholderImg = 'https://placehold.co/60x60/e2e8f0/cbd5e0?text=Gambar';
                     row.innerHTML = `
+                        <td class="p-3">
+                            <button class="view-image-btn" data-img-src="${item.imageUrl || placeholderImg}">
+                                <img src="${item.imageUrl || placeholderImg}" alt="${item.name}" class="w-16 h-16 object-cover rounded-md cursor-pointer hover:opacity-75 transition-opacity">
+                            </button>
+                        </td>
                         <td class="p-3 text-sm text-gray-700">${item.id}</td>
                         <td class="p-3 text-sm text-gray-700 font-medium">${item.name}</td>
                         <td class="p-3 text-sm text-gray-700">${item.quantity}</td>
@@ -209,17 +238,14 @@
                 });
             }
             
-            // Fungsi untuk menampilkan modal
             function showModal(modal) {
                 modal.classList.remove('hidden');
             }
 
-            // Fungsi untuk menyembunyikan modal
             function hideModal(modal) {
                 modal.classList.add('hidden');
             }
             
-            // Mengatur form ke mode "Tambah Barang"
             function setCreateMode() {
                 editItemId = null;
                 form.reset();
@@ -229,11 +255,10 @@
                 submitButton.className = 'w-full bg-blue-600 text-white font-bold py-2.5 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all';
             }
 
-            // Mengatur form ke mode "Edit Barang"
             function setEditMode(item) {
                 editItemId = item.id;
                 document.getElementById('kodeBarang').value = item.id;
-                document.getElementById('kodeBarang').disabled = true; // Kode barang tidak bisa diedit
+                document.getElementById('kodeBarang').disabled = true;
                 document.getElementById('namaBarang').value = item.name;
                 document.getElementById('jumlahBarang').value = item.quantity;
                 document.getElementById('satuanBarang').value = item.unit;
@@ -246,26 +271,30 @@
 
             // === EVENT LISTENERS ===
 
-            // Listener utama pada tabel untuk tombol Edit dan Hapus
             tableBody.addEventListener('click', function(event) {
                 const target = event.target;
-                const id = target.dataset.id;
-                if (!id) return;
+                const button = target.closest('button');
+                if (!button) return;
 
-                if (target.classList.contains('edit-btn')) {
+                const id = button.dataset.id;
+
+                if (button.classList.contains('edit-btn')) {
                     currentAction = 'edit';
                     actionItemId = id;
                     authTitle.textContent = 'Autentikasi untuk Mengedit';
                     showModal(authModal);
-                } else if (target.classList.contains('delete-btn')) {
+                } else if (button.classList.contains('delete-btn')) {
                     currentAction = 'delete';
                     actionItemId = id;
                     authTitle.textContent = 'Autentikasi untuk Menghapus';
                     showModal(authModal);
+                } else if (button.classList.contains('view-image-btn')) {
+                    const imgSrc = button.dataset.imgSrc;
+                    modalImage.src = imgSrc;
+                    showModal(imageModal);
                 }
             });
 
-            // Listener untuk form autentikasi
             authForm.addEventListener('submit', function(event) {
                 event.preventDefault();
                 const user = usernameInput.value;
@@ -287,7 +316,6 @@
                 }
             });
             
-            // Listener untuk tombol konfirmasi aksi (Ya)
             confirmActionBtn.addEventListener('click', function() {
                 hideModal(confirmActionModal);
                 if (currentAction === 'delete') {
@@ -302,45 +330,63 @@
                 }
             });
 
-            // Listener untuk form utama (Tambah atau Simpan Perubahan)
             form.addEventListener('submit', function(event) {
                 event.preventDefault();
                 
-                const values = {
-                    id: document.getElementById('kodeBarang').value.trim(),
-                    name: document.getElementById('namaBarang').value.trim(),
-                    quantity: parseInt(document.getElementById('jumlahBarang').value),
-                    unit: document.getElementById('satuanBarang').value.trim(),
-                    description: document.getElementById('keteranganBarang').value.trim()
+                const imageFile = document.getElementById('gambarBarang').files[0];
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    const imageUrl = e.target.result;
+
+                    const values = {
+                        id: document.getElementById('kodeBarang').value.trim(),
+                        name: document.getElementById('namaBarang').value.trim(),
+                        quantity: parseInt(document.getElementById('jumlahBarang').value),
+                        unit: document.getElementById('satuanBarang').value.trim(),
+                        description: document.getElementById('keteranganBarang').value.trim(),
+                        imageUrl: imageUrl
+                    };
+
+                    if (editItemId) {
+                        const itemIndex = inventory.findIndex(item => item.id === editItemId);
+                        if (itemIndex > -1) {
+                            if (!imageFile) {
+                                values.imageUrl = inventory[itemIndex].imageUrl;
+                            }
+                            inventory[itemIndex] = { ...inventory[itemIndex], ...values };
+                        }
+                        setCreateMode();
+                    } else {
+                        if (inventory.some(item => item.id.toLowerCase() === values.id.toLowerCase())) {
+                            alert('Kode barang sudah ada. Harap gunakan kode yang unik.');
+                            return;
+                        }
+                        inventory.push(values);
+                        form.reset();
+                    }
+                    
+                    saveInventory();
+                    renderTable(inventory);
+                    document.getElementById('kodeBarang').focus();
                 };
 
-                if (editItemId) { // Mode Edit
-                    const itemIndex = inventory.findIndex(item => item.id === editItemId);
-                    if (itemIndex > -1) {
-                        inventory[itemIndex] = { ...inventory[itemIndex], ...values };
-                    }
-                    setCreateMode();
-                } else { // Mode Tambah
-                    if (inventory.some(item => item.id.toLowerCase() === values.id.toLowerCase())) {
-                        alert('Kode barang sudah ada. Harap gunakan kode yang unik.');
-                        return;
-                    }
-                    inventory.push(values);
-                    form.reset();
+                if (imageFile) {
+                    reader.readAsDataURL(imageFile);
+                } else {
+                    reader.onload({ target: { result: (editItemId ? inventory.find(i=>i.id===editItemId).imageUrl : null) } });
                 }
-                
-                saveInventory();
-                renderTable(inventory);
-                document.getElementById('kodeBarang').focus();
             });
             
-            // Listeners untuk membatalkan/menutup modal
             cancelAuthBtn.addEventListener('click', () => hideModal(authModal));
             cancelActionBtn.addEventListener('click', () => hideModal(confirmActionModal));
             authModal.addEventListener('click', (e) => e.target === authModal && hideModal(authModal));
             confirmActionModal.addEventListener('click', (e) => e.target === confirmActionModal && hideModal(confirmActionModal));
+            
+            // [BARU] Listener untuk menutup modal gambar
+            closeImageModalBtn.addEventListener('click', () => hideModal(imageModal));
+            imageModal.addEventListener('click', (e) => e.target === imageModal && hideModal(imageModal));
 
-            // Listener untuk pencarian
             searchInput.addEventListener('keyup', function() {
                 const searchTerm = searchInput.value.toLowerCase();
                 const filtered = inventory.filter(item => 
