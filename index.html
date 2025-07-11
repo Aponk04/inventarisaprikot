@@ -70,6 +70,7 @@
                         <label for="gambarBarang" class="block text-sm font-medium text-gray-600 mb-1">Gambar Barang</label>
                         <input type="file" id="gambarBarang" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
                         <img id="imagePreview" src="" alt="Pratinjau Gambar" class="mt-2 rounded-md max-h-32 hidden"/>
+                        <p class="text-xs text-gray-500 mt-1">Maksimal ukuran gambar: 500 KB</p>
                     </div>
                     <button id="submitButton" type="submit" class="w-full bg-blue-600 text-white font-bold py-2.5 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all flex items-center justify-center">
                         + Tambah ke Inventaris
@@ -107,7 +108,7 @@
                         </thead>
                         <tbody id="inventoryTableBody" class="divide-y divide-gray-100"></tbody>
                     </table>
-                     <p id="noResults" class="text-center text-gray-500 py-8 hidden">Tidak ada barang yang ditemukan.</p>
+                    <p id="noResults" class="text-center text-gray-500 py-8 hidden">Tidak ada barang yang ditemukan.</p>
                 </div>
             </div>
         </div>
@@ -118,7 +119,7 @@
             <h3 id="authTitle" class="text-lg font-bold">Autentikasi Diperlukan</h3>
             <p class="text-gray-600 my-2">Masukkan username dan password untuk melanjutkan.</p>
             <form id="authForm" class="space-y-4 mt-4">
-                 <div>
+                <div>
                     <label for="username" class="block text-sm font-medium text-gray-600 mb-1">Username</label>
                     <input type="text" id="username" class="w-full p-2 border border-gray-300 rounded-md">
                 </div>
@@ -157,17 +158,26 @@
     <script src="https://unpkg.com/jspdf-autotable@latest/dist/jspdf.plugin.autotable.js"></script>
     
     <script type="module">
+        // --- Utility Function to Convert File to Base64 ---
+        const toBase64 = file => new Promise((resolve, reject) => {
+            const reader = new FileReader(); 
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result); 
+            reader.onerror = error => reject(error);
+        });
+
         // Import fungsi yang dibutuhkan dari Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
         import { getFirestore, collection, getDocs, doc, getDoc, addDoc, setDoc, deleteDoc, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-        import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js";
+        // Firebase Storage tidak lagi digunakan untuk penyimpanan gambar, hapus impornya
+        // import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js";
 
         // Konfigurasi Firebase Anda
         const firebaseConfig = {
             apiKey: "AIzaSyBP0atHEeRMxiT5ZV7_3lzMbKQMNQjuuN4",
             authDomain: "inventaris-28b9e.firebaseapp.com",
             projectId: "inventaris-28b9e",
-            storageBucket: "inventaris-28b9e.appspot.com",
+            storageBucket: "inventaris-28b9e.appspot.com", 
             messagingSenderId: "186480577129",
             appId: "1:186480577129:web:bc53ec6492e4447b5830f8"
         };
@@ -175,7 +185,8 @@
         // Inisialisasi Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const storage = getStorage(app);
+        // Hapus inisialisasi storage
+        // const storage = getStorage(app); 
         const inventoryCollection = collection(db, "items");
 
         // === ELEMEN DOM ===
@@ -219,6 +230,11 @@
         function showModal(modal) { modal.classList.remove('hidden'); }
         function hideModal(modal) { modal.classList.add('hidden'); }
         
+        // Batasan ukuran file gambar (DIUBAH UNTUK BASE64)
+        // Maksimal 500KB input file, karena Base64 akan ~33% lebih besar
+        // sehingga 500KB * 1.33 = ~665KB, masih di bawah batas 1MB Firestore.
+        const MAX_IMAGE_SIZE_BYTES = 500 * 1024; // 500 KB
+        
         async function loadInventory() {
             showLoader();
             // Menggunakan onSnapshot untuk real-time updates
@@ -240,7 +256,8 @@
             data.forEach(item => {
                 const row = document.createElement('tr');
                 row.className = 'hover:bg-gray-50';
-                const placeholderImg = 'https://placehold.co/60x60/e2e8f0/cbd5e0?text=Gambar';
+                // Placeholder gambar umum, karena Base64 mungkin kosong atau rusak
+                const placeholderImg = 'https://placehold.co/60x60/e2e8f0/cbd5e0?text=Gambar'; 
                 row.innerHTML = `
                     <td class="p-3">
                         <button class="view-image-btn" data-img-src="${item.imageUrl || placeholderImg}">
@@ -263,6 +280,9 @@
             });
         }
 
+        // Fungsi uploadImage ini DIHAPUS karena tidak lagi mengunggah ke Firebase Storage.
+        // Data gambar akan disimpan langsung sebagai Base64 di Firestore.
+        /*
         async function uploadImage(file) {
             if (!file) return null;
             const storageRef = ref(storage, `inventory_images/${Date.now()}_${file.name}`);
@@ -276,6 +296,7 @@
                 return null;
             }
         }
+        */
 
         function setCreateMode() {
             editItemId = null;
@@ -302,6 +323,8 @@
             } else {
                 imagePreview.classList.add('hidden');
             }
+            // Kosongkan input file saat edit, agar pengguna memilih ulang jika ingin mengganti
+            document.getElementById('gambarBarang').value = ''; 
 
             formTitle.textContent = `Mengedit: ${item.name}`;
             submitButton.innerHTML = 'Simpan Perubahan';
@@ -314,11 +337,14 @@
             
             showLoader();
             try {
-                // Hapus gambar dari Storage jika ada
+                // Saat menggunakan Base64, tidak ada file di Firebase Storage untuk dihapus.
+                // Logika penghapusan ini dihapus.
+                /*
                 if (itemToDelete.imageUrl) {
                     const imageRef = ref(storage, itemToDelete.imageUrl);
                     await deleteObject(imageRef);
                 }
+                */
                 // Hapus data dari Firestore
                 await deleteDoc(doc(db, "items", itemId));
                 // Real-time update akan menangani render ulang tabel
@@ -335,12 +361,24 @@
         imageInput.addEventListener('change', function(event) {
             const file = event.target.files[0];
             if (file) {
+                // Validasi ukuran file di sini (sebelum pratinjau)
+                if (file.size > MAX_IMAGE_SIZE_BYTES) {
+                    alert(`Ukuran gambar terlalu besar! Maksimal ${MAX_IMAGE_SIZE_BYTES / (1024)} KB.`);
+                    event.target.value = ''; // Kosongkan input file
+                    imagePreview.src = ''; // Hapus pratinjau
+                    imagePreview.classList.add('hidden'); // Sembunyikan pratinjau
+                    return; // Hentikan fungsi
+                }
+
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     imagePreview.src = e.target.result;
                     imagePreview.classList.remove('hidden');
                 }
                 reader.readAsDataURL(file);
+            } else {
+                imagePreview.src = ''; // Kosongkan pratinjau jika tidak ada file dipilih
+                imagePreview.classList.add('hidden'); // Sembunyikan pratinjau jika tidak ada file dipilih
             }
         });
         
@@ -350,8 +388,16 @@
             submitButton.innerHTML = `<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Menyimpan...`;
 
             const imageFile = document.getElementById('gambarBarang').files[0];
-            let imageUrl = null;
-            
+            let imageUrl = null; // Ini akan menjadi string Base64 gambar
+
+            // Validasi ukuran file sebagai fallback keamanan saat submit
+            if (imageFile && imageFile.size > MAX_IMAGE_SIZE_BYTES) {
+                alert(`Ukuran gambar terlalu besar! Maksimal ${MAX_IMAGE_SIZE_BYTES / (1024)} KB.`);
+                submitButton.disabled = false;
+                submitButton.innerHTML = '+ Tambah ke Inventaris'; // Kembalikan teks tombol
+                return; // Hentikan proses submit
+            }
+
             const itemData = {
                 code: document.getElementById('kodeBarang').value.trim(),
                 name: document.getElementById('namaBarang').value.trim(),
@@ -363,20 +409,17 @@
             try {
                 if (editItemId) { // Mode Edit
                     const itemToUpdate = inventory.find(item => item.id === editItemId);
-                    imageUrl = itemToUpdate.imageUrl; // Gunakan gambar lama sebagai default
-                    
-                    if (imageFile) { // Jika ada gambar baru diunggah
-                        if(imageUrl) { // Hapus gambar lama jika ada
-                            try {
-                                await deleteObject(ref(storage, imageUrl));
-                            } catch (e) { console.warn("Could not delete old image, it might not exist.", e); }
-                        }
-                        imageUrl = await uploadImage(imageFile); // Unggah yang baru
+                    // Jika ada gambar baru diunggah, konversi ke Base64
+                    if (imageFile) {
+                        imageUrl = await toBase64(imageFile);
+                    } else {
+                        // Jika tidak ada gambar baru diunggah, pertahankan gambar lama (Base64 string)
+                        imageUrl = itemToUpdate.imageUrl || null;
                     }
                     
                     itemData.imageUrl = imageUrl;
                     const itemRef = doc(db, "items", editItemId);
-                    await setDoc(itemRef, itemData);
+                    await setDoc(itemRef, itemData); // setDoc akan menimpa seluruh dokumen
                     setCreateMode();
 
                 } else { // Mode Tambah
@@ -387,8 +430,9 @@
                         return; // Hentikan proses
                     }
                     
+                    // Jika ada gambar baru diunggah, konversi ke Base64
                     if(imageFile) {
-                        imageUrl = await uploadImage(imageFile);
+                        imageUrl = await toBase64(imageFile);
                     }
                     itemData.imageUrl = imageUrl;
                     await addDoc(inventoryCollection, itemData);
@@ -494,25 +538,24 @@
                  headStyles: { fillColor: [41, 128, 185], textColor: 255, fontStyle: 'bold' },
                  columnStyles: { 0: { minCellWidth: 50, minCellHeight: 50 } },
                  didDrawCell: function(data) {
-                    if (data.column.index === 0 && data.cell.section === 'body') {
-                        const item = inventory[data.row.index];
-                        if (item.imageUrl) {
-                            try {
-                                const img = new Image();
-                                img.src = item.imageUrl;
-                                // Anda mungkin perlu menangani CORS jika gambar dari domain lain
-                                // Untuk Firebase Storage, atur aturan CORS yang sesuai.
-                                const imgWidth = 40;
-                                const imgHeight = 40;
-                                const x = data.cell.x + (data.cell.width - imgWidth) / 2;
-                                const y = data.cell.y + (data.cell.height - imgHeight) / 2;
-                                doc.addImage(img, 'JPEG', x, y, imgWidth, imgHeight);
-                            } catch (e) {
-                                console.error(`Error adding image for item ${item.code}:`, e);
-                            }
-                        }
-                    }
-                }
+                     if (data.column.index === 0 && data.cell.section === 'body') {
+                         const item = inventory[data.row.index];
+                         if (item.imageUrl) {
+                             try {
+                                 const img = new Image();
+                                 img.src = item.imageUrl;
+                                 // Untuk Base64, tidak perlu CORS karena data sudah ada di string
+                                 const imgWidth = 40;
+                                 const imgHeight = 40;
+                                 const x = data.cell.x + (data.cell.width - imgWidth) / 2;
+                                 const y = data.cell.y + (data.cell.height - imgHeight) / 2;
+                                 doc.addImage(img, 'JPEG', x, y, imgWidth, imgHeight); // Perhatikan format 'JPEG'
+                             } catch (e) {
+                                 console.error(`Error adding image for item ${item.code}:`, e);
+                             }
+                         }
+                     }
+                 }
              });
              doc.save('inventaris-ruangan-aprikot.pdf');
         });
