@@ -340,7 +340,7 @@
 
             // === STATE APLIKASI ===
             let inventory = []; // Menyimpan semua data inventaris
-            let currentAction = null; // Menyimpan aksi yang sedang dikonfirmasi (edit/delete)
+            let currentAction = null; // Menyimpan aksi yang sedang dikonfirmasi (edit/delete/exportPdf)
             let actionItemId = null; // Menyimpan ID item yang sedang dalam aksi (edit/delete)
             let editItemId = null; // Menyimpan ID item yang sedang diedit
 
@@ -371,12 +371,11 @@
 
             // Fungsi untuk memperbarui statistik dashboard
             function updateDashboardStats(data) {
-                const totalItems = data.length;
                 const baik = data.filter(item => item.description === 'Berfungsi dengan baik').length;
                 const rusakRingan = data.filter(item => item.description === 'Rusak ringan').length;
                 const rusakTotal = data.filter(item => item.description === 'Rusak Total').length;
 
-                if (totalItemsDisplay) totalItemsDisplay.textContent = totalItems;
+                if (totalItemsDisplay) totalItemsDisplay.textContent = data.length;
                 if (kondisiBaikDisplay) kondisiBaikDisplay.textContent = baik;
                 if (kondisiRusakRinganDisplay) kondisiRusakRinganDisplay.textContent = rusakRingan;
                 if (kondisiRusakTotalDisplay) kondisiRusakTotalDisplay.textContent = rusakTotal;
@@ -401,9 +400,9 @@
                         label: 'Jumlah Barang',
                         data: [baik, rusakRingan, rusakTotal],
                         backgroundColor: [
-                            'rgba(75, 192, 192, 0.7)', // Hijau-biru untuk Baik
-                            'rgba(255, 206, 86, 0.7)', // Kuning-oranye untuk Rusak Ringan
-                            'rgba(255, 99, 132, 0.7)'  // Merah untuk Rusak Total
+                            'rgb(71, 255, 99)', 
+                            'rgb(255, 215, 0)', 
+                            'rgb(244,67,54)'  
                         ],
                         borderColor: [
                             'rgba(75, 192, 192, 1)',
@@ -416,10 +415,10 @@
 
                 const chartOptions = {
                     responsive: true,
-                    maintainAspectRatio: false, // Penting untuk kontrol ukuran di div parent
+                    maintainAspectRatio: false, 
                     plugins: {
                         legend: {
-                            display: false // Sembunyikan legenda karena label sudah jelas
+                            display: false 
                         },
                         title: {
                             display: true,
@@ -428,25 +427,23 @@
                                 size: 14,
                                 weight: 'bold'
                             },
-                            color: '#4B5563' // gray-700
+                            color: '#4B5563' 
                         }
                     },
                     scales: {
                         y: {
                             beginAtZero: true,
                             ticks: {
-                                precision: 0 // Pastikan sumbu Y adalah bilangan bulat
+                                precision: 0 
                             }
                         }
                     }
                 };
 
                 if (kondisiBarangChart) {
-                    // Jika chart sudah ada, update datanya
                     kondisiBarangChart.data = chartData;
                     kondisiBarangChart.update();
                 } else {
-                    // Jika chart belum ada, inisialisasi yang baru
                     kondisiBarangChart = new Chart(kondisiBarangChartCanvas, {
                         type: 'bar',
                         data: chartData,
@@ -515,9 +512,9 @@
             // Fungsi untuk mengatur form ke mode "Tambah Barang Baru"
             function setCreateMode() {
                 editItemId = null;
-                form.reset(); // Mereset form
+                form.reset(); 
                 imagePreview.classList.add('hidden');
-                kodeBarangInput.disabled = false; // Mengaktifkan input kode barang
+                kodeBarangInput.disabled = false; 
                 formTitle.textContent = 'Tambah Barang Baru';
                 submitButton.innerHTML = '+ Tambah ke Inventaris';
                 submitButton.className = 'w-full bg-blue-600 text-white font-bold py-2.5 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all flex items-center justify-center';
@@ -527,11 +524,11 @@
             function setEditMode(item) {
                 editItemId = item.id;
                 kodeBarangInput.value = item.code;
-                kodeBarangInput.disabled = true; // Menonaktifkan input kode barang saat edit
+                kodeBarangInput.disabled = true; 
                 namaBarangInput.value = item.name;
                 jumlahBarangInput.value = item.quantity;
                 satuanBarangInput.value = item.unit;
-                keteranganBarangInput.value = item.description; // Memuat nilai ke select
+                keteranganBarangInput.value = item.description; 
                 
                 if (item.imageUrl) {
                     imagePreview.src = item.imageUrl;
@@ -539,7 +536,7 @@
                 } else {
                     imagePreview.classList.add('hidden');
                 }
-                imageInput.value = ''; // Kosongkan input file
+                imageInput.value = ''; 
                 formTitle.textContent = `Mengedit: ${item.name}`;
                 submitButton.innerHTML = 'Simpan Perubahan';
                 submitButton.className = 'w-full bg-green-600 text-white font-bold py-2.5 px-4 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all flex items-center justify-center';
@@ -560,6 +557,51 @@
                     hideLoader();
                 }
             }
+
+            // Fungsi untuk melakukan ekspor PDF
+            function executeExportPdf() {
+                 const { jsPDF } = window.jspdf;
+                 const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'legal' });
+                 doc.setFontSize(18);
+                 doc.text('Daftar Inventaris Barang - Ruangan Aprikot', 40, 40);
+
+                 const tableData = inventory.map(item => [
+                     '', 
+                     item.code,
+                     item.name,
+                     item.quantity,
+                     item.unit,
+                     item.description || '-'
+                 ]);
+
+                 doc.autoTable({
+                     head: [['Gambar', 'Kode', 'Nama Barang', 'Jumlah', 'Satuan', 'Keterangan']],
+                     body: tableData,
+                     startY: 60, theme: 'grid', styles: { fontSize: 10, cellPadding: 6, valign: 'middle' },
+                     headStyles: { fillColor: [41, 128, 185], textColor: 255, fontStyle: 'bold' },
+                     columnStyles: { 0: { minCellWidth: 50, minCellHeight: 50 } },
+                     didDrawCell: function(data) {
+                         if (data.column.index === 0 && data.cell.section === 'body') {
+                             const item = inventory[data.row.index];
+                             if (item.imageUrl) {
+                                 try {
+                                     const img = new Image();
+                                     img.src = item.imageUrl;
+                                     const imgWidth = 40;
+                                     const imgHeight = 40;
+                                     const x = data.cell.x + (data.cell.width - imgWidth) / 2;
+                                     const y = data.cell.y + (data.cell.height - imgHeight) / 2;
+                                     doc.addImage(img, 'JPEG', x, y, imgWidth, imgHeight); 
+                                 } catch (e) {
+                                     console.error(`Error adding image for item ${item.code}:`, e);
+                                 }
+                             }
+                         }
+                     }
+                 });
+                 doc.save('inventaris-ruangan-aprikot.pdf');
+            }
+
 
             // === EVENT LISTENERS ===
             
@@ -715,6 +757,14 @@
                 }
             });
 
+            // Event listener KHUSUS untuk tombol Export PDF (memanggil autentikasi)
+            exportPdfButton.addEventListener('click', () => {
+                currentAction = 'exportPdf'; // Set aksi saat ini
+                authTitle.textContent = 'Autentikasi untuk Export PDF';
+                showModal(authModal);
+            });
+
+
             // Event listener untuk submit form autentikasi
             authForm.addEventListener('submit', function(event) {
                 event.preventDefault();
@@ -725,7 +775,7 @@
                     authError.classList.add('hidden');
                     
                     // Setelah autentikasi berhasil, tampilkan modal konfirmasi
-                    confirmMessage.textContent = `Apakah Anda yakin ingin ${currentAction === 'edit' ? 'mengedit' : 'menghapus'} barang ini?`;
+                    confirmMessage.textContent = `Apakah Anda yakin ingin ${currentAction === 'edit' ? 'mengedit' : (currentAction === 'delete' ? 'menghapus' : 'melakukan export PDF')} barang ini?`;
                     showModal(confirmActionModal);
                 } else {
                     authError.classList.remove('hidden');
@@ -746,7 +796,11 @@
                         console.error("Item for edit not found with ID:", actionItemId);
                         alert("Barang yang akan diedit tidak ditemukan.");
                     }
+                } else if (currentAction === 'exportPdf') { // Tambahan untuk Export PDF
+                    executeExportPdf();
                 }
+                currentAction = null; // Reset aksi setelah selesai
+                actionItemId = null; // Reset ID item
             });
 
             // Event listener untuk pencarian barang
@@ -762,61 +816,32 @@
             
             // Event listeners untuk menutup modal-modal lainnya
             cancelAuthBtn.addEventListener('click', () => { hideModal(authModal); authForm.reset(); authError.classList.add('hidden'); });
-            cancelActionBtn.addEventListener('click', () => hideModal(confirmActionModal));
-            authModal.addEventListener('click', (e) => e.target === authModal && hideModal(authModal));
-            confirmActionModal.addEventListener('click', (e) => e.target === confirmActionModal && hideModal(confirmActionModal));
+            cancelActionBtn.addEventListener('click', () => { 
+                hideModal(confirmActionModal); 
+                currentAction = null; // Pastikan aksi direset jika dibatalkan
+                actionItemId = null; // Pastikan ID direset jika dibatalkan
+            });
+            authModal.addEventListener('click', (e) => {
+                if (e.target === authModal) {
+                    hideModal(authModal);
+                    currentAction = null; // Reset aksi jika modal ditutup via klik luar
+                    actionItemId = null;
+                }
+            });
+            confirmActionModal.addEventListener('click', (e) => {
+                if (e.target === confirmActionModal) {
+                    hideModal(confirmActionModal);
+                    currentAction = null; // Reset aksi jika modal ditutup via klik luar
+                    actionItemId = null;
+                }
+            });
             closeImageModalBtn.addEventListener('click', () => hideModal(imageModal));
-            imageModal.addEventListener('click', (e) => e.target === imageModal && hideModal(imageModal));
+            imageModal.addEventListener('click', (e) => { if (e.target === imageModal) hideModal(imageModal); });
             closeStatusDetailModalBtn.addEventListener('click', () => hideModal(statusDetailModal));
             statusDetailModal.addEventListener('click', (e) => {
                 if (e.target === statusDetailModal) hideModal(statusDetailModal);
             });
 
-
-            // Event listener untuk ekspor PDF
-            exportPdfButton.addEventListener('click', () => {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'legal' });
-                doc.setFontSize(18);
-                doc.text('Daftar Inventaris Barang - Ruangan Aprikot', 40, 40);
-
-                const tableData = inventory.map(item => [
-                    '', 
-                    item.code,
-                    item.name,
-                    item.quantity,
-                    item.unit,
-                    item.description || '-'
-                ]);
-
-                doc.autoTable({
-                    head: [['Gambar', 'Kode', 'Nama Barang', 'Jumlah', 'Satuan', 'Keterangan']],
-                    body: tableData,
-                    startY: 60, theme: 'grid', styles: { fontSize: 10, cellPadding: 6, valign: 'middle' },
-                    headStyles: { fillColor: [41, 128, 185], textColor: 255, fontStyle: 'bold' },
-                    columnStyles: { 0: { minCellWidth: 50, minCellHeight: 50 } },
-                    didDrawCell: function(data) {
-                        if (data.column.index === 0 && data.cell.section === 'body') {
-                            const item = inventory[data.row.index];
-                            if (item.imageUrl) {
-                                try {
-                                    const img = new Image();
-                                    img.src = item.imageUrl;
-                                    const imgWidth = 40;
-                                    const imgHeight = 40;
-                                    const x = data.cell.x + (data.cell.width - imgWidth) / 2;
-                                    const y = data.cell.y + (data.cell.height - imgHeight) / 2;
-                                    doc.addImage(img, 'JPEG', x, y, imgWidth, imgHeight); 
-                                } catch (e) {
-                                    console.error(`Error adding image for item ${item.code}:`, e);
-                                }
-                            }
-                        }
-                    }
-                });
-                doc.save('inventaris-ruangan-aprikot.pdf');
-            });
-            
             // === INISIALISASI ===
             loadInventory();
 
