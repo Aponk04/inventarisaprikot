@@ -38,44 +38,18 @@
         
         <header class="mb-8 text-center">
             <h1 class="text-3xl md:text-4xl font-bold text-gray-700">📦 Aplikasi Inventaris ruangan Aprikot</h1>
-            <p class="text-gray-500 mt-2">Dikelola dengan Firebase.</p>
+            <p class="text-gray-500 mt-2">Ingat kata bijak Pak Agus :<br>"Jika Masalahmu tidak ada jalan keluar , maka kami yang akan jalan- jalan keluar"</p>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
-            <div class="lg:col-span-1 bg-white p-6 rounded-xl shadow-md h-fit">
-                <h2 id="formTitle" class="text-xl font-semibold mb-4 border-b pb-3">Tambah Barang Baru</h2>
-                <form id="formBarang" class="space-y-4">
-                    <div>
-                        <label for="kodeBarang" class="block text-sm font-medium text-gray-600 mb-1">Kode Barang</label>
-                        <input type="text" id="kodeBarang" placeholder="Contoh: BRG-001" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" required>
-                    </div>
-                    <div>
-                        <label for="namaBarang" class="block text-sm font-medium text-gray-600 mb-1">Nama Barang</label>
-                        <input type="text" id="namaBarang" placeholder="Contoh: Laptop" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" required>
-                    </div>
-                    <div>
-                        <label for="jumlahBarang" class="block text-sm font-medium text-gray-600 mb-1">Jumlah</label>
-                        <input type="number" id="jumlahBarang" placeholder="Contoh: 10" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" required>
-                    </div>
-                    <div>
-                        <label for="satuanBarang" class="block text-sm font-medium text-gray-600 mb-1">Satuan</label>
-                        <input type="text" id="satuanBarang" placeholder="Contoh: Unit, Pcs, Box" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" required>
-                    </div>
-                    <div>
-                        <label for="keteranganBarang" class="block text-sm font-medium text-gray-600 mb-1">Keterangan</label>
-                        <input type="text" id="keteranganBarang" placeholder="Contoh: RAM 16GB, Warna Hitam" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
-                    </div>
-                    <div>
-                        <label for="gambarBarang" class="block text-sm font-medium text-gray-600 mb-1">Gambar Barang</label>
-                        <input type="file" id="gambarBarang" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-                        <img id="imagePreview" src="" alt="Pratinjau Gambar" class="mt-2 rounded-md max-h-32 hidden"/>
-                        <p class="text-xs text-gray-500 mt-1">Maksimal ukuran gambar: 500 KB</p>
-                    </div>
-                    <button id="submitButton" type="submit" class="w-full bg-blue-600 text-white font-bold py-2.5 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all flex items-center justify-center">
-                        + Tambah ke Inventaris
-                    </button>
-                </form>
+            <div class="lg:col-span-1">
+                <button id="openAddFormModalBtn" class="w-full bg-blue-500 text-white font-bold py-3 px-4 rounded-xl hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all flex items-center justify-center mb-6 shadow-md">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Tambah Barang
+                </button>
             </div>
 
             <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-md">
@@ -103,7 +77,7 @@
                                 <th class="p-3 text-sm font-semibold tracking-wide">Jumlah</th>
                                 <th class="p-3 text-sm font-semibold tracking-wide">Satuan</th>
                                 <th class="p-3 text-sm font-semibold tracking-wide">Keterangan</th>
-                                <th class="p-3 text-sm font-semibold tracking-wide text-center">Aksi</th>
+                                <th class="p-3 text-sm text-center font-semibold tracking-wide">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="inventoryTableBody" class="divide-y divide-gray-100"></tbody>
@@ -111,6 +85,46 @@
                     <p id="noResults" class="text-center text-gray-500 py-8 hidden">Tidak ada barang yang ditemukan.</p>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div id="addBarangModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden z-50 p-4">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-11/12 max-w-lg modal-fade-in relative">
+            <h2 id="formTitle" class="text-xl font-semibold mb-4 border-b pb-3">Tambah Barang Baru</h2>
+            <form id="formBarang" class="space-y-4">
+                <div>
+                    <label for="kodeBarang" class="block text-sm font-medium text-gray-600 mb-1">Kode Barang</label>
+                    <input type="text" id="kodeBarang" placeholder="Contoh: BRG-001" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" required>
+                </div>
+                <div>
+                    <label for="namaBarang" class="block text-sm font-medium text-gray-600 mb-1">Nama Barang</label>
+                    <input type="text" id="namaBarang" placeholder="Contoh: Laptop" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" required>
+                </div>
+                <div>
+                    <label for="jumlahBarang" class="block text-sm font-medium text-gray-600 mb-1">Jumlah</label>
+                    <input type="number" id="jumlahBarang" placeholder="Contoh: 10" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" required>
+                </div>
+                <div>
+                    <label for="satuanBarang" class="block text-sm font-medium text-gray-600 mb-1">Satuan</label>
+                    <input type="text" id="satuanBarang" placeholder="Contoh: Unit, Pcs, Box" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" required>
+                </div>
+                <div>
+                    <label for="keteranganBarang" class="block text-sm font-medium text-gray-600 mb-1">Keterangan</label>
+                    <input type="text" id="keteranganBarang" placeholder="Contoh: RAM 16GB, Warna Hitam" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                </div>
+                <div>
+                    <label for="gambarBarang" class="block text-sm font-medium text-gray-600 mb-1">Gambar Barang</label>
+                    <input type="file" id="gambarBarang" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                    <img id="imagePreview" src="" alt="Pratinjau Gambar" class="mt-2 rounded-md max-h-32 hidden"/>
+                    <p class="text-xs text-gray-500 mt-1">Maksimal ukuran gambar: 500 KB</p>
+                </div>
+                <button id="submitButton" type="submit" class="w-full bg-blue-600 text-white font-bold py-2.5 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all flex items-center justify-center">
+                    + Tambah ke Inventaris
+                </button>
+            </form>
+            <button id="closeAddFormModal" class="absolute -top-3 -right-3 bg-white rounded-full p-1.5 text-gray-800 hover:bg-gray-200 transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
         </div>
     </div>
 
@@ -169,8 +183,6 @@
         // Import fungsi yang dibutuhkan dari Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
         import { getFirestore, collection, getDocs, doc, getDoc, addDoc, setDoc, deleteDoc, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-        // Firebase Storage tidak lagi digunakan untuk penyimpanan gambar, hapus impornya
-        // import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js";
 
         // Konfigurasi Firebase Anda
         const firebaseConfig = {
@@ -185,22 +197,35 @@
         // Inisialisasi Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        // Hapus inisialisasi storage
-        // const storage = getStorage(app); 
         const inventoryCollection = collection(db, "items");
 
         // === ELEMEN DOM ===
+        // Akses form terlebih dahulu, baru elemen di dalamnya
         const form = document.getElementById('formBarang');
-        const formTitle = document.getElementById('formTitle');
-        const submitButton = document.getElementById('submitButton');
+        const formTitle = form.querySelector('#formTitle'); // Akses formTitle di dalam formBarang
+        const submitButton = form.querySelector('#submitButton'); // Akses submitButton di dalam formBarang
+
         const tableBody = document.getElementById('inventoryTableBody');
         const searchInput = document.getElementById('cariBarang');
         const noResults = document.getElementById('noResults');
         const loader = document.getElementById('loader');
         const imagePreview = document.getElementById('imagePreview');
         const imageInput = document.getElementById('gambarBarang');
+        // Akses input-input form lainnya langsung karena ID-nya unik di dokumen.
+        const kodeBarangInput = document.getElementById('kodeBarang');
+        const namaBarangInput = document.getElementById('namaBarang');
+        const jumlahBarangInput = document.getElementById('jumlahBarang');
+        const satuanBarangInput = document.getElementById('satuanBarang');
+        const keteranganBarangInput = document.getElementById('keteranganBarang');
 
-        // Modal
+
+        // Elemen baru untuk modal form
+        const openAddFormModalBtn = document.getElementById('openAddFormModalBtn');
+        const addBarangModal = document.getElementById('addBarangModal');
+        const closeAddFormModalBtn = document.getElementById('closeAddFormModal');
+
+
+        // Modal autentikasi dan konfirmasi
         const authModal = document.getElementById('authModal');
         const authForm = document.getElementById('authForm');
         const authTitle = document.getElementById('authTitle');
@@ -280,29 +305,12 @@
             });
         }
 
-        // Fungsi uploadImage ini DIHAPUS karena tidak lagi mengunggah ke Firebase Storage.
-        // Data gambar akan disimpan langsung sebagai Base64 di Firestore.
-        /*
-        async function uploadImage(file) {
-            if (!file) return null;
-            const storageRef = ref(storage, `inventory_images/${Date.now()}_${file.name}`);
-            try {
-                const snapshot = await uploadBytes(storageRef, file);
-                const downloadURL = await getDownloadURL(snapshot.ref);
-                return downloadURL;
-            } catch (error) {
-                console.error("Error uploading image: ", error);
-                alert("Gagal mengunggah gambar.");
-                return null;
-            }
-        }
-        */
-
         function setCreateMode() {
             editItemId = null;
             form.reset();
             imagePreview.classList.add('hidden');
-            document.getElementById('kodeBarang').disabled = false;
+            // Pastikan input-input form diakses melalui referensi langsung
+            kodeBarangInput.disabled = false;
             formTitle.textContent = 'Tambah Barang Baru';
             submitButton.innerHTML = '+ Tambah ke Inventaris';
             submitButton.className = 'w-full bg-blue-600 text-white font-bold py-2.5 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all flex items-center justify-center';
@@ -310,12 +318,13 @@
 
         function setEditMode(item) {
             editItemId = item.id;
-            document.getElementById('kodeBarang').value = item.code;
-            document.getElementById('kodeBarang').disabled = true;
-            document.getElementById('namaBarang').value = item.name;
-            document.getElementById('jumlahBarang').value = item.quantity;
-            document.getElementById('satuanBarang').value = item.unit;
-            document.getElementById('keteranganBarang').value = item.description;
+            // Akses input-input form melalui referensi langsung
+            kodeBarangInput.value = item.code;
+            kodeBarangInput.disabled = true;
+            namaBarangInput.value = item.name;
+            jumlahBarangInput.value = item.quantity;
+            satuanBarangInput.value = item.unit;
+            keteranganBarangInput.value = item.description;
             
             if (item.imageUrl) {
                 imagePreview.src = item.imageUrl;
@@ -324,7 +333,7 @@
                 imagePreview.classList.add('hidden');
             }
             // Kosongkan input file saat edit, agar pengguna memilih ulang jika ingin mengganti
-            document.getElementById('gambarBarang').value = ''; 
+            imageInput.value = ''; 
 
             formTitle.textContent = `Mengedit: ${item.name}`;
             submitButton.innerHTML = 'Simpan Perubahan';
@@ -337,14 +346,6 @@
             
             showLoader();
             try {
-                // Saat menggunakan Base64, tidak ada file di Firebase Storage untuk dihapus.
-                // Logika penghapusan ini dihapus.
-                /*
-                if (itemToDelete.imageUrl) {
-                    const imageRef = ref(storage, itemToDelete.imageUrl);
-                    await deleteObject(imageRef);
-                }
-                */
                 // Hapus data dari Firestore
                 await deleteDoc(doc(db, "items", itemId));
                 // Real-time update akan menangani render ulang tabel
@@ -358,6 +359,27 @@
 
         // === EVENT LISTENERS ===
         
+        // Event listener untuk tombol "Tambah Barang" (membuka modal)
+        openAddFormModalBtn.addEventListener('click', function() {
+            setCreateMode(); // Pastikan form dalam mode tambah baru saat dibuka
+            showModal(addBarangModal);
+        });
+
+        // Event listener untuk tombol tutup modal form
+        closeAddFormModalBtn.addEventListener('click', function() {
+            hideModal(addBarangModal);
+            setCreateMode(); // Reset form saat modal ditutup
+        });
+
+        // Menutup modal jika klik di luar konten modal
+        addBarangModal.addEventListener('click', (e) => {
+            if (e.target === addBarangModal) {
+                hideModal(addBarangModal);
+                setCreateMode(); // Reset form saat modal ditutup dengan klik luar
+            }
+        });
+
+
         imageInput.addEventListener('change', function(event) {
             const file = event.target.files[0];
             if (file) {
@@ -387,50 +409,49 @@
             submitButton.disabled = true;
             submitButton.innerHTML = `<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Menyimpan...`;
 
-            const imageFile = document.getElementById('gambarBarang').files[0];
-            let imageUrl = null; // Ini akan menjadi string Base64 gambar
+            const imageFile = imageInput.files[0]; // Akses melalui imageInput
+            let imageUrl = null; 
 
-            // Validasi ukuran file sebagai fallback keamanan saat submit
             if (imageFile && imageFile.size > MAX_IMAGE_SIZE_BYTES) {
                 alert(`Ukuran gambar terlalu besar! Maksimal ${MAX_IMAGE_SIZE_BYTES / (1024)} KB.`);
                 submitButton.disabled = false;
-                submitButton.innerHTML = '+ Tambah ke Inventaris'; // Kembalikan teks tombol
-                return; // Hentikan proses submit
+                submitButton.innerHTML = '+ Tambah ke Inventaris'; 
+                return; 
             }
 
             const itemData = {
-                code: document.getElementById('kodeBarang').value.trim(),
-                name: document.getElementById('namaBarang').value.trim(),
-                quantity: parseInt(document.getElementById('jumlahBarang').value),
-                unit: document.getElementById('satuanBarang').value.trim(),
-                description: document.getElementById('keteranganBarang').value.trim(),
+                code: kodeBarangInput.value.trim(), // Akses melalui referensi langsung
+                name: namaBarangInput.value.trim(),
+                quantity: parseInt(jumlahBarangInput.value),
+                unit: satuanBarangInput.value.trim(),
+                description: keteranganBarangInput.value.trim(),
             };
 
             try {
                 if (editItemId) { // Mode Edit
                     const itemToUpdate = inventory.find(item => item.id === editItemId);
-                    // Jika ada gambar baru diunggah, konversi ke Base64
                     if (imageFile) {
                         imageUrl = await toBase64(imageFile);
                     } else {
-                        // Jika tidak ada gambar baru diunggah, pertahankan gambar lama (Base64 string)
                         imageUrl = itemToUpdate.imageUrl || null;
                     }
                     
                     itemData.imageUrl = imageUrl;
                     const itemRef = doc(db, "items", editItemId);
-                    await setDoc(itemRef, itemData); // setDoc akan menimpa seluruh dokumen
-                    setCreateMode();
+                    await setDoc(itemRef, itemData); 
+                    hideModal(addBarangModal); // Tutup modal setelah simpan
+                    setCreateMode(); 
 
                 } else { // Mode Tambah
                     const q = query(inventoryCollection, where("code", "==", itemData.code));
                     const querySnapshot = await getDocs(q);
                     if (!querySnapshot.empty) {
                         alert('Kode barang sudah ada. Harap gunakan kode yang unik.');
-                        return; // Hentikan proses
+                        submitButton.disabled = false;
+                        submitButton.innerHTML = '+ Tambah ke Inventaris';
+                        return; 
                     }
                     
-                    // Jika ada gambar baru diunggah, konversi ke Base64
                     if(imageFile) {
                         imageUrl = await toBase64(imageFile);
                     }
@@ -438,14 +459,16 @@
                     await addDoc(inventoryCollection, itemData);
                     form.reset();
                     imagePreview.classList.add('hidden');
+                    hideModal(addBarangModal); // Tutup modal setelah tambah
                 }
             } catch (error) {
                 console.error("Error saving data: ", error);
                 alert("Terjadi kesalahan saat menyimpan data.");
             } finally {
                 submitButton.disabled = false;
-                if (editItemId) setCreateMode();
-                else {
+                if (editItemId) { 
+                    submitButton.innerHTML = 'Simpan Perubahan';
+                } else { 
                     submitButton.innerHTML = '+ Tambah ke Inventaris';
                 }
             }
@@ -494,7 +517,10 @@
                 handleDelete(actionItemId);
             } else if (currentAction === 'edit') {
                 const itemToEdit = inventory.find(item => item.id === actionItemId);
-                if (itemToEdit) setEditMode(itemToEdit);
+                if (itemToEdit) {
+                    setEditMode(itemToEdit);
+                    showModal(addBarangModal); // Tampilkan modal form saat mode edit
+                }
             }
         });
 
@@ -559,6 +585,8 @@
              });
              doc.save('inventaris-ruangan-aprikot.pdf');
         });
+        
+        /* Saya telah menyesuaikan MAX_IMAGE_SIZE_BYTES menjadi 500 KB (0.5 MB) untuk input file. Ini adalah ukuran yang lebih realistis untuk menghindari masalah batas 1 MB per dokumen Firestore setelah konversi ke Base64 (karena Base64 akan lebih besar 33%). Jika Anda mencoba mengunggah gambar yang mendekati 1 MB, kemungkinan besar akan gagal disimpan ke Firestore.*/
 
         // === INISIALISASI ===
         loadInventory();
